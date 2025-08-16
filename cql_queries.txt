@@ -1,0 +1,22 @@
+SELECT COUNT(*) FROM movies;
+
+ count
+-------
+   100
+
+(1 rows)
+
+#create index on rating
+CREATE INDEX IF NOT EXISTS index_rating
+ON entertainment.movies ( rating );  
+
+
+#cql query to count the number of movies that are rated 'G'.
+SELECT COUNT(*) FROM movies
+WHERE rating='G';
+
+ count
+-------
+    32
+
+(1 rows)

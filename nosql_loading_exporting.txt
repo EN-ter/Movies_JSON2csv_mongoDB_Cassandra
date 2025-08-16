@@ -1,0 +1,57 @@
+#------BASH--------
+#get data file (available in repo)
+curl -O https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMSkillsNetwork-DB0151EN-edX/labs/FinalProject/movies.json
+
+
+# connect to mongodb server
+mongosh mongodb://root:zE63QL9lANIXGTT3gHhWbR20@...
+
+#
+mongosh -u root -p <PASSWORD> --authenticationDatabase admin local --host mongo
+
+#-----mongo shell---- switch context to entertainment db
+use entertainment
+
+#-----mongo shell----create collection
+db.createCollection("movies")
+
+#------Bash--------
+#import movies.json
+mongoimport -u root -p <PASSWORD> --authenticationDatabase admin --db entertainment --collection movies --file movies.json --host mongo
+
+
+#----Bash---- export as csv file
+mongoexport -u root -p <PASSWORD> --authenticationDatabase admin -d entertainment -c movies -f "_id,title,year,rating,Director" --type=csv -o partial_data.csv --host mongo
+
+
+#----Bash to connect to Casandra
+cqlsh 172.21.135.244 9042 --username root --password <PASSWORD>
+
+#create keyspace
+CREATE KEYSPACE entertainment
+WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+
+#use keyspace
+use entertainment;
+
+
+#create table movies
+CREATE TABLE movies( 
+	movie_id int PRIMARY KEY,
+	title text,
+	release_year int,
+	rating text,
+	director text);
+	
+#import data from partial_data.csv into table
+COPY entertainment.movies(movie_id, title, release_year, rating, director) 
+FROM '/home/project/partial_data.csv' 
+WITH DELIMITER=',' AND HEADER=TRUE;
+
+
+
+
+
+
+
+
